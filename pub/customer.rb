@@ -1,23 +1,22 @@
 class Customer
 
-  attr_accessor :name, :wallet
+  attr_accessor :name, :wallet, :age, :drunkness
 
-  def initialize(name, wallet)
+  def initialize(name, wallet, age, drunkness)
     @name = name
     @wallet = wallet
-    @drinks = []
+    @age = age
+    @drunkness = drunkness
   end
 
   def pay(drink_price)
     @wallet -= drink_price
   end
 
-  def drink_count()
-    @drinks.size()
-  end
-
-  def take_drink(drink)
-    @drinks.push(drink)
+  def buy_drink(drink, drink_price)
+    drink_price = drink.price
+    pay(drink_price)
+    @drunkness += drink.alcohol_level
   end
 
 end

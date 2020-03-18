@@ -7,6 +7,8 @@ class Pub
     @name = name
     @stock = stock
     @till = till
+    @age_limit = 18
+    @alcohol_limit = 50
   end
 
   def till_count()
@@ -17,8 +19,7 @@ class Pub
     @stock.size()
   end
 
-  def till_add_cash(customer, drink_price)
-    customer.pay(drink_price)
+  def till_add_cash(drink_price)
     @till += drink_price
   end
 
@@ -34,15 +35,27 @@ class Pub
     @stock << drink
   end
 
-  def add_drink_to_customer(customer, drink)
-    remove_drink(drink)
-    customer.take_drink(customer)
-  end
-
   def drink_transaction(customer, drink)
     drink_price = drink.price
-    add_drink_to_customer(customer, drink)
-    till_add_cash(customer, drink_price)
+    customer.buy_drink(drink, drink_price)
+    till_add_cash(drink_price)
+    remove_drink(drink)
+  end
+
+  def serve_drink(customer, drink)
+    if check_age?(customer) == true
+      if customer.drunkness < @alcohol_limit
+      drink_transaction(customer, drink)
+      end
+    end
+  end
+
+  def check_age?(customer)
+    if customer.age >= @age_limit
+      return true
+    else
+      return false
+    end
   end
 
 end
