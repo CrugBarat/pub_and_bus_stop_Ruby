@@ -3,6 +3,7 @@ require('minitest/reporters')
 require_relative('../pub.rb')
 require_relative('../customer.rb')
 require_relative('../drink.rb')
+require_relative('../food.rb')
 
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
@@ -12,11 +13,15 @@ class TestPub < Minitest::Test
     @customer1 = Customer.new("John", 100, 33, 30)
     @customer2 = Customer.new("Albert", 45, 16, 5)
     @customer3 = Customer.new("Frank", 75, 48, 55)
+    @customer4 = Customer.new("Ed", 5, 27, 55)
     @drink1 = Drink.new("Beer", 5, 5)
     @drink2 = Drink.new("Gin", 8, 10)
     @drink3 = Drink.new("Rum", 4, 15)
     @stock = [@drink1, @drink2]
-    @pub = Pub.new("The Horse's Hoof", 50, @stock)
+    @food1 = Food.new("Burger", 6, 25)
+    @food2 = Food.new("Taco", 4, 10)
+    @food_menu = [@food1, @food2]
+    @pub = Pub.new("The Horse's Hoof", 50, @stock, @food_menu)
   end
 
   def test_get_name()
@@ -36,8 +41,16 @@ class TestPub < Minitest::Test
     assert_equal(@stock, @pub.stock())
   end
 
-  def test_check_stock()
+  def test_get_food
+    assert_equal(@food_menu, @pub.food_menu())
+  end
+
+  def test_stock_count()
     assert_equal(2, @pub.stock_count())
+  end
+
+  def test_food_count()
+    assert_equal(2, @pub.food_count())
   end
 
   def test_till_can_add_cash()
@@ -58,6 +71,22 @@ class TestPub < Minitest::Test
   def test_can_add_drink_to_stock()
     @pub.add_drink(@drink3)
     assert_equal(3, @pub.stock_count())
+  end
+
+  def test_customer_can_afford_drink__true()
+    assert_equal(true, @pub.customer_can_afford_drink(@customer1, @drink1))
+  end
+
+  def test_customer_can_afford_drink__false()
+    assert_equal(false, @pub.customer_can_afford_food(@customer4, @drink2))
+  end
+
+  def test_customer_can_afford_food__true()
+    assert_equal(true, @pub.customer_can_afford_food(@customer1, @food1))
+  end
+
+  def test_customer_can_afford_food__false()
+    assert_equal(false, @pub.customer_can_afford_food(@customer4, @food1))
   end
 
   def test_drink_transaction()
@@ -120,6 +149,14 @@ class TestPub < Minitest::Test
     assert_equal(2, @pub.stock_count())
     assert_equal(75, @customer3.wallet())
     assert_equal(55, @customer3.drunkness())
+  end
+
+  def test_sell_food()
+    @pub.sell_food(@customer1, @food1)
+    assert_equal(56, @pub.till_count())
+    assert_equal(1, @pub.food_count())
+    assert_equal(94, @customer1.wallet())
+    assert_equal(5, @customer1.drunkness())
   end
 
 end
